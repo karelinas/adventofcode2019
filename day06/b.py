@@ -1,41 +1,16 @@
 import sys
+from a import read_graph
 
-def first_common_ancestor(graph, child1, child2):
-    # first make a list of all ancestors for child 1
-    child1_ancestors = []
-    child = graph.get(child1)
-    while child in graph:
-        child1_ancestors.append(child)
-        child = graph.get(child)
+def full_path(graph, node):
+    path = set()
+    while node in graph:
+        node = graph.get(node)
+        path.add(node)
+    return path
 
-    # then find the first shared ancestor
-    child = graph.get(child2)
-    while child in graph:
-        if child in child1_ancestors:
-            return child
-        child = graph.get(child)
+def node_distance(graph, node1, node2):
+    return len(set.symmetric_difference(full_path(graph, node1),
+                                        full_path(graph, node2)))
 
-    return None
-
-
-def distance_to_ancestor(graph, child, ancestor):
-    distance = 0
-    while child != ancestor:
-        child = graph.get(child)
-        distance += 1
-    return distance
-
-graph = {}
-
-for line in sys.stdin:
-    line = line.strip()
-    if not len(line):
-        continue
-    parent, child = line.split(')')
-    graph[child] = parent
-
-common_ancestor = first_common_ancestor(graph, "YOU", "SAN")
-distance_to_santa = (distance_to_ancestor(graph, "YOU", common_ancestor) +
-                     distance_to_ancestor(graph, "SAN", common_ancestor) - 2)
-
-print(distance_to_santa)
+graph = read_graph(sys.stdin)
+print(node_distance(graph, "YOU", "SAN"))
